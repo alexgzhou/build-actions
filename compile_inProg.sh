@@ -595,7 +595,9 @@ else
 	TIME y "正在使用[$(nproc)线程]编译固件,预计要[1]小时左右,请耐心等待..."
 fi
 sleep 15
-make -j$(nproc) V=s 2>&1 |tee build.log
+# nohup sh -c 'make -j$(nproc) V=s 2>&1 |tee build.log' &
+nohup make -j$(nproc) V=s 2>&1 |tee build.log &
+# make -j$(nproc) V=s 2>&1 |tee build.log
 
 if [ "$?" == "0" ]; then
 	if [[ ${firmware} == "Mortal_source" ]]; then
