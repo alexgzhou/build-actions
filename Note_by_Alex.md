@@ -1,3 +1,8 @@
+## 本地编译操作步骤
+1. 在云服务器上 (如 `oracle` 云服务器) 非 root 用户下 `$ git clone https://github.com/alexgzhou/build-actions.git`  
+2. `$ cd build-actions && chmod 755 compile.sh && ./compile.sh` -> 交互选择一些选项, (可选) 进入 `.config - OpenWrt Configuration menu` 进行 `.config` 配置, 退出配置后自动完成编译并显示编译信息  
+3. 可以定时同步一下上游 (`upstream https://github.com/281677160/build-actions` 库): `$ git remote add upstream https://github.com/281677160/build-actions && git pull upstream`, 然后 `merge`  
+
 ### 本地编译的一些坑
 1. `$ make menuconfig` 对 `ssh` 终端显示大小有要求, 必须在 `19 row * 81 col` 以上, 否则会提示终端显示大学不够, 无法进入 `.config - OpenWrt Configuration menu`, 或者出现奇怪的问题, 比如无法回车进入 `menu` 中 `Target System` 等选项的下级菜单  
 2. 某些云 (如 `oracle cloud`) 上的 `Ubuntu` 镜像进行了精简, 可能造成编译环境依赖的缺失, 比如 `cmake`, 如果编译日志中出现相关错误提示, 可以手动安装依赖, 如 `$ sudo apt-get install cmake`  
