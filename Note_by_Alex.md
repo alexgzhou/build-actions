@@ -1,5 +1,5 @@
 ## 本地编译操作步骤
-1. 在云服务器上 (如 `oracle` 云服务器) 非 root 用户下 `$ git clone https://github.com/alexgzhou/build-actions.git`  
+1. 在云服务器上 (如 `oracle` 云服务器, 硬盘剩余空间 `20 GB` 以上, 内存要求 `1-4 GB`, 不够就加一个 `swapfile` 虚拟内存) 非 `root` 用户下 `$ git clone https://github.com/alexgzhou/build-actions.git`  
 2. `$ cd build-actions && chmod 755 compile.sh && ./compile.sh` -> 交互选择一些选项, (可选) 进入 `.config - OpenWrt Configuration menu` 进行 `.config` 配置, 退出配置后自动完成编译并显示编译信息  
 3. 可以定时同步一下上游 (`upstream https://github.com/281677160/build-actions` 库): `$ git remote add upstream https://github.com/281677160/build-actions && git pull upstream`, 然后 `merge`  
 

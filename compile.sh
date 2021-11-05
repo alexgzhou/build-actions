@@ -573,12 +573,14 @@ echo ${PWD} - build-actions/openwrt, 当前目录为 openwrt
 # exit 0
 # 思路及验证
 # 以 nohup 挂起运行, 用 sh -c 运行引号中的脚本 (nohup 只能执行单行命令脚本, 这里用脚本解释器执行多行命令脚本) => 引号中的 make 命令 (make -j$(nproc) V=s) 执行后将 stderr 重定向到 stdout 输出 (2>&1), 并同时通过管道 (|) 传递给 tee 写入 build.log 文件中, 引号中的命令脚本 (make ... | tee ...) 以 & 后台运行并将该命令的 pid ($!) 保存到 compile.pid 文件 (以便 tail 追踪 pid, pid 执行结束后, tail 会退出, 否则 tail 最后不会退出, 后面的脚本就无法继续执行) => nohup 自定义输出到 nohup_xx.out 文件, 默认输出到 nohup.out 文件 (> nohup_xx.out)
-# nohup sh -c 'a=1; while true; do echo $(date); a=$(expr $a + 1); sleep 1; if [ "$a" == "10" ]; then break; fi; done 2>&1 |tee build.log & echo $! > compile.pid' > nohup_sh.out; tail -n 3 --pid $(cat compile.pid) -s 2 -f build.log  # test & verify the thoughts above
-# nohup bash -c 'a=1; while true; do echo $(date); a=$(expr $a + 1); sleep 1; if [ "$a" == "10" ]; then break; fi; done 2>&1 |tee build.log & echo $! > compile.pid' > nohup_bash.out; sleep 3 && tail -n 3 --pid $(cat compile.pid) -s 2 -f build.log  # test & verify the thoughts above
+# nohup sh -c 'a=1; while true; do echo $(date); a=$(expr $a + 1); sleep 1; if [ "$a" == "10" ]; then break; fi; done 2>&1 |tee build.log & echo $! > compile.pid' > nohup_sh.out; tail -n 3 --pid $(cat compile.pid) -s 2 -f build.log  # test & verify the thoughts above; pid 不对, 实际保存的是 tee build.log 的 pid, 而不是前面 while, echo, sleep 等指令的 pid
+# nohup bash -c 'a=1; while true; do echo $(date); a=$(expr $a + 1); sleep 1; if [ "$a" == "10" ]; then break; fi; done 2>&1 |tee build.log & echo $! > compile.pid' > nohup_bash.out; sleep 3 && tail -n 3 --pid $(cat compile.pid) -s 2 -f build.log  # test & verify the thoughts above; pid 不对, 实际保存的是 tee build.log 的 pid, 而不是前面 while, echo, sleep 等指令的 pid
+# nohup sh -c 'sleep 5 2>&1 |tee hehehe.log & echo $! > xixixi.pid' > nohup_xxx.out; ps -elf | grep 'slee[p] 5'; ps -elf | grep heh[e]he.log; cat xixixi.pid  # 测试一下 (可以用 [] 框住 grep 后面的任意一个字符, 这样就不会显示 grep 命令本身的进程), 这时 xixixi.pid 实际保存的是 tee hehehe.log 的 pid, 而不是 sleep 5 的 pid, 还要调整一下, 调整后命令如下 (不能用 |tee hehehe.log 了, 改成 >hehehe.log)
+# nohup sh -c 'sleep 5 && echo hahahaha 2>&1 >hehehe.log & echo $!> sss.pid' > nohup_xxx.out; ps -elf | grep 'slee[p] 5'; cat sss.pid; cat hehehe.log; cat nohup_xxx.out
 # 实际执行
-# nohup make -j$(nproc) V=s 2>&1 |tee build.log & echo $! > compile.pid > nohup_.out  # 后台非挂起执行
-nohup sh -c 'make -j$(nproc) V=s 2>&1 |tee build.log & echo $! > compile.pid' > nohup_sh.out  # 用 sh 脚本解释器后台非挂起执行
-# nohup bash -c 'make -j$(nproc) V=s 2>&1 |tee build.log & echo $! > compile.pid' > nohup_bash.out  # 用 bash 脚本解释器后台非挂起执行
+# nohup make -j$(nproc) V=s 2>&1 >build.log & echo $! > compile.pid > nohup_.out  # 后台非挂起执行 (直接把原始指令中的 |tee 改为 >, 变成一条指令, 而不是两条指令, 这样 $! 中保存的就是 make 的 pid; & 加在任何一条指令之后就代表将这条指令放入 sub-shell 后台运行, 可以多条并列, 如 command1 & command2 & command3 &, 三个指令会同时开始运行, 且拥有各自独立的 sub-shell 环境, 这个方法常常被用来利用计算机的多核性能来加速执行)
+nohup sh -c 'make -j$(nproc) V=s 2>&1 >build.log & echo $! > compile.pid' > nohup_sh.out  # 用 sh 脚本解释器后台非挂起执行 (直接把原始指令中的 |tee 改为 >, 变成一条指令, 而不是两条指令, 这样 $! 中保存的就是 make 的 pid; & 加在任何一条指令之后就代表将这条指令放入 sub-shell 后台运行, 可以多条并列, 如 command1 & command2 & command3 &, 三个指令会同时开始运行, 且拥有各自独立的 sub-shell 环境, 这个方法常常被用来利用计算机的多核性能来加速执行)
+# nohup bash -c 'make -j$(nproc) V=s 2>&1 >build.log & echo $! > compile.pid' > nohup_bash.out  # 用 bash 脚本解释器后台非挂起执行 (直接把原始指令中的 |tee 改为 >, 变成一条指令, 而不是两条指令, 这样 $! 中保存的就是 make 的 pid; & 加在任何一条指令之后就代表将这条指令放入 sub-shell 后台运行, 可以多条并列, 如 command1 & command2 & command3 &, 三个指令会同时开始运行, 且拥有各自独立的 sub-shell 环境, 这个方法常常被用来利用计算机的多核性能来加速执行)
 # make -j$(nproc) V=s 2>&1 |tee build.log  # 原始脚本
 # sleep 5  # 可选
 tail -n 100 --pid $(cat compile.pid) -s 5 -f build.log  # 跟踪 build.log 文件显示编译日志 (-f 持续更新); --pid $(cat compile.pid) 追踪 pid, pid 执行结束后会消失, tail 就会退出, 否则 tail 最后不会退出, 后面的脚本就无法继续执行; -n 100 显示最后 100 条日志; -s 5 每隔 5 秒查看一下 pid 并输出日志
