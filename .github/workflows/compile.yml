@@ -41,7 +41,6 @@ jobs:
       fail-fast: false
       matrix:
         target: [Lede_source_XiaomiR4A]
-        
         # [Lede_source,Lienol_source,Mortal_source,Tianling_source,openwrt_amlogic]
 
     steps:
