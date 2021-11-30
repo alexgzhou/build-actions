@@ -1,0 +1,74 @@
+无需拆机 只需使用软件 简单易学 视频中软件及固件下载：https://wwa.lanzoui.com/ib7dUpiak5i
+补充说明：本方案在小米4A千兆版官方固件版本为2.28.38、2.28.58、2.28.69均成功开启telnet功能。
+Padavan固件默认管理地址：192.168.2.1 默认账户密码都是admin 默认WIFI密码1234567890
+压缩包内的openwrt固件默认管理地址：192.168.31.1 密码coolxiaomi WiFi密码coolxiaomi
+
+刷固件后要重新进入 breed 192.168.1.1 的，可以拔掉路由器电源，然后按住reset键，插上电源后10秒钟再松开reset，就可以抹掉之前刷的固件，重新进入breed，再刷新固件
+
+此刷机方法适用于小米4a千兆版(r3gv2)、r3g、r3p、r4等
+
+准备工作：
+
+路由器正常联网状态
+
+电脑网线插入路由lan口，ip地址设置自动获取
+
+开启win10的telnet服务
+
+安装python 注意：安装的时候一定要勾选add python 3.x.x to path！！
+
+win+R 输入 cmd 打开命令窗口
+
+python -m pip install --upgrade pip   #升级pip最新
+
+pip install pycryptodome
+
+pip install requests
+
+下载winscp软件并安装，用来上传breed文件及下载路由备份用
+
+https://breed.hackpascal.net/  breed下载
+
+恩山论坛下载openwrt固件或者padavan固件
+
+去github下载acecilia大神开发的小米路由开启telnet的软件：
+
+https://github.com/acecilia/OpenWRTInvasion
+
+cmd下载输入
+
+F:
+
+cd OpenWRTInvasion-0.0.3
+
+python remote_command_execution_vulnerability.py
+
+192.168.31.1
+
+输入stok值(浏览器打开路由器管理页面上复制，不要关掉管理页面，不然stok值会变动)，等待完成
+
+telnet 192.168.31.1
+
+root 回车
+
+cat /proc/mtd #显示路由分区
+
+dd if=/dev/mtd0 of=/tmp/all.bin 
+
+dd if=/dev/mtd1 of=/tmp/Bootloader.bin
+
+#刷breed之前备份固件，方便日后刷回。
+
+用winscp登入路由，ftp协议，ip地址192.168.31.1，账号root密码空，把breed文件上传到tmp文件夹内，把备份的固件下载到电脑
+
+cd /tmp
+
+mtd -r write breed-mt7621-pbr-m1.bin Bootloader  #小米4a千兆版 3Gv2 的breed
+
+mtd -r write breed-mt7621-xiaomi-r3g.bin Bootloader #小米4 3G 的breed
+
+浏览器打开192.168.1.1进入恢复台，备份eeprom和固件，截图mac地址，刷写openwrt固件。
+
+对于NAND闪存的刷openwrt，需要在Breed里添加环境变量xiaomi.r3g.bootfw，值为2，如果刷padavan不需要添加。
+
+刷固件后要重新进入 breed 192.168.1.1 的，可以拔掉路由器电源，然后按住reset键，插上电源后10秒钟再松开reset，就可以抹掉之前刷的固件，重新进入breed，再刷新固件
