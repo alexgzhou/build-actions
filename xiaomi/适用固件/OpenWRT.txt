@@ -1,0 +1,5 @@
+openwrt-ramips-mt7621-xiaomi_r4a-squashfs-sysupgrade
+
+https://downloads.openwrt.org/releases/22.03.5/targets/ramips/mt7621/openwrt-22.03.5-ramips-mt7621-xiaomi_mi-router-4a-gigabit-squashfs-sysupgrade.bin
+https://downloads.openwrt.org/releases/21.02.3/targets/ramips/mt7621/openwrt-21.02.3-ramips-mt7621-xiaomi_mi-router-4a-gigabit-squashfs-sysupgrade.bin
+
