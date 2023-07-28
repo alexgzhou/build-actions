@@ -2,3 +2,5 @@ https://opt.cn2qq.com/padavan/
 https://bitbucket.org/padavan/rt-n56u/src/master/
 
 https://opt.cn2qq.com/padavan/MI-R4A_3.4.3.9-099.trx
+
+管理地址看自动获取的 IP, 默认是 192.168.3.1, 默认用户名密码是 admin/admin
